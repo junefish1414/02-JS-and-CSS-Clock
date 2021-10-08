@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>JS + CSS Clock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -12,15 +15,24 @@
         <div class="hand hour-hand"></div>
         <div class="hand min-hand"></div>
         <div class="hand second-hand"></div>
+        <div class="number">
+          <span class="clock-num num-twelve">12</span>
+          <span class="clock-num num-three">3</span>
+          <span class="clock-num num-six">6</span>
+          <span class="clock-num num-nine">9</span>
+        </div>
       </div>
     </div>
+
+    <footer class="picSourse">Photo by Alyani Yang on Unsplash</footer>
 
 
   <style>
     html {
-      background: #018DED url(https://unsplash.it/1500/1000?image=881&blur=5);
+      background: url(/background2.jpg);
       background-size: cover;
-      font-family: 'helvetica neue';
+      background-position: center;
+      font-family: 'Quicksand', sans-serif;
       text-align: center;
       font-size: 10px;
     }
@@ -29,24 +41,29 @@
       margin: 0;
       font-size: 2rem;
       display: flex;
+      position: relative;
       flex: 1;
       min-height: 100vh;
       align-items: center;
     }
 
     .clock {
-      width: 30rem;
-      height: 30rem;
-      border: 20px solid white;
-      border-radius: 50%;
+      width: 35rem;
+      height: 35rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      background:rgba(255,255,255,0.1);
+      box-shadow: 0px 0px 20px rgb(0 0 0 / 80%), inset 0 0 3px rgb(0 0 0 / 50%);
       margin: 50px auto;
       position: relative;
       padding: 2rem;
-      box-shadow:
+      backdrop-filter: blur(3px);
+      border-image: linear-gradient(315deg, #f5f5f21a, #f5f5f23b, #d6d7d71f) 1;
+    clip-path: inset(0 round 15px);
+      /* box-shadow:
         0 0 0 4px rgba(0,0,0,0.1),
         inset 0 0 0 3px #EFEFEF,
         inset 0 0 10px black,
-        0 0 10px rgba(0,0,0,0.2);
+        0 0 10px rgba(0,0,0,0.2); */
     }
 
     .clock-face {
@@ -54,20 +71,137 @@
       width: 100%;
       height: 100%;
       transform: translateY(-3px); /* account for the height of the clock hands */
+      transform:rotate(90deg);
+    }
+    .clock-face:before{
+      content: "";
+      position: absolute;
+      background-color:#1f1e1c;
+      width: 13px;
+      height: 13px;
+      border-radius:100%;
+      left: 50%;
+      top: 50%;
+      transform:translate(-50%,-50%);
+      z-index: 99;
+    }
+    .clock-face:after{
+      content: "";
+      position: absolute;
+      background-color:#e6e3de;
+      width: 20px;
+      height: 20px;
+      border-radius:100%;
+      left: 50%;
+      top: 50%;
+      transform:translate(-50%,-50%);
     }
 
     .hand {
       width: 50%;
       height: 6px;
-      background: black;
+      background: #888;
       position: absolute;
+      top: 50%;
+      transform-origin: 100%;
+      box-shadow: 0px 0px 20px rgb(0 0 0 / 80%);
+      border-radius: 5px;
+    }
+    .hour-hand{
+      height: 6px;
+      width: 30%;
+      margin-left: 20%;
+    }
+    .min-hand{
+      height: 4px;
+      width: 45%;
+      margin-left: 5%;
+    }
+    .second-hand{
+      height: 2px;
+    }
+
+    .picSourse{
+      display: block;
+      background-color: #000;
+      color: #999;
+      font-size: 16px;
+      letter-spacing: 0.03em;
+      opacity: 0.8;
+      text-align: center;
+      width: 100%;
+      padding: 10px 0;
+      position: absolute;
+      left:0;
+      bottom: 0;
+    }
+    .number{
+      color:#FFF;
+      font-size: 40px;
+      position: relative;
+      transform: rotate(-90deg);
+      width: 35rem;
+      height: 35rem;
+    }
+    .number span{
+      position: absolute;
+      transform: translate(-50%,-50%);
+      filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.8));
+    }
+    .num-twelve{
+      left:50%;
+      top: 5%;
+    }
+    .num-three{
+      left:95%;
+      top: 50%;
+    }
+    .num-six{
+      left: 50%;;
+      top: 95%;
+    }
+    .num-nine{
+      left: 5%;
       top: 50%;
     }
 
   </style>
 
   <script>
+    const hourHand = document.querySelector('.hour-hand');
+    const minHand = document.querySelector('.min-hand');
+    const secondHand = document.querySelector('.second-hand');
 
+    // 設定時間該怎麼跑
+    function setDate(){
+      const now = new Date();
+      const second = now.getSeconds();
+      const min = now.getMinutes();
+      const hour = now.getHours();
+
+      let secondDeg = ((second/60) *360) ;
+      secondHand.style.transform = setRotate(secondDeg);
+      
+      let minDeg = ((min/60)*360);
+      minHand.style.transform = setRotate(minDeg);
+
+      let hourDeg = ((hour/12)*360) + ((min/12/60)*360);
+      hourHand.style.transform = setRotate(hourDeg);
+      
+    }
+
+    function setRotate(deg){
+      if(deg ===0) {
+        document.querySelector('.hand').style.transiton = 'all 0s';
+      }
+      else{
+        document.querySelector('.hand').style.transiton = 'ease .3s';
+      }
+      return `rotate(${deg}deg)`;
+    }
+
+    // 啟用時間
+    setInterval(setDate,1000);
 
   </script>
 </body>
